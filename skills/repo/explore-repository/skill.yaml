@@ -1,0 +1,58 @@
+id: repo/explore-repository
+name: Explore Repository
+domain: repo
+version: 1.0.0
+intent: 在只读约束下建立仓库结构化理解，并为后续工作流提供可信上下文。
+inputs:
+  - name: repository_path
+    type: string
+    description: 待探索仓库的绝对路径
+    required: true
+  - name: focus_areas
+    type: string[]
+    description: 需要重点关注的模块或目录
+    required: false
+  - name: constraints
+    type: object
+    description: 时间与深度等执行约束
+    required: false
+outputs:
+  - name: repository_report
+    type: markdown
+    description: 包含仓库结构、模块职责、风险与未知项的分析报告
+workflow:
+  steps:
+    - id: scan-structure
+      title: 扫描目录与关键配置
+      instructions: 使用只读命令获取目录与核心配置文件。
+    - id: infer-architecture
+      title: 识别架构边界
+      instructions: 提炼模块职责、构建入口与测试入口。
+    - id: emit-report
+      title: 生成结构化报告
+      instructions: 输出固定章节并标注证据来源与未知项。
+success_criteria:
+  - 输出包含固定章节且结构完整的 repository_report。
+  - 报告中的关键判断可追溯到仓库文件或命令输出。
+  - 明确列出未知项，不做无依据断言。
+failure_modes:
+  - mode: repo_too_large
+    trigger: 仓库规模过大，完整扫描超出预算
+    fallback: 降级到顶层目录和关键配置扫描，并声明覆盖范围。
+  - mode: missing_key_files
+    trigger: 缺少构建或测试关键配置
+    fallback: 报告中显式列出缺失信息与补充建议。
+official_mapping:
+  openai:
+    native_tools: ["terminal", "workspace file read"]
+    mapping_notes: 使用官方工具进行只读探索并输出可追溯结论。
+  github_copilot:
+    native_tools: ["chat", "workspace context", "terminal task"]
+    mapping_notes: 在工作区上下文中完成仓库结构理解与总结。
+  anthropic:
+    native_tools: ["Claude Code shell", "file read"]
+    mapping_notes: 通过只读 shell 与文件浏览生成结构化仓库概览。
+stability_notes:
+  - 禁止编造事实、命令、指标或性能数据。
+  - 所有关键结论必须带证据或标记为未知。
+  - 输出语言默认中文，字段名保持英文。

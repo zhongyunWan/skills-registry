@@ -1,0 +1,18 @@
+case_id: eval-onboard-review-release-basic
+skill_id: workflows/onboard-review-release
+input:
+  repository_path: /tmp/demo-repo
+  pull_request_ref: PR-42
+  commits_range: v1.1.0..v1.2.0
+expected_output_constraints:
+  required_sections:
+    - repository_report 摘要
+    - review_report 摘要
+    - release_notes
+    - 全流程风险与阻塞
+  ordered_steps: ["explore", "review", "release"]
+must_not:
+  - 编造事实
+  - 编造命令
+  - 编造指标或性能数据
+fallback_expectation: 任一步失败时，必须停止后续执行并返回部分可用结果。

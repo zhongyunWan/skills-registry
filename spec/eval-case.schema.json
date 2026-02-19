@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-registry.local/spec/eval-case.schema.json",
+  "title": "Skill Eval Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "skill_id",
+    "input",
+    "expected_output_constraints",
+    "must_not",
+    "fallback_expectation"
+  ],
+  "properties": {
+    "case_id": { "type": "string", "minLength": 3 },
+    "skill_id": { "type": "string", "minLength": 3 },
+    "input": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": true
+    },
+    "expected_output_constraints": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": true
+    },
+    "must_not": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "fallback_expectation": { "type": "string", "minLength": 5 }
+  }
+}

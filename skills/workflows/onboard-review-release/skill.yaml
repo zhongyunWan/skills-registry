@@ -1,0 +1,58 @@
+id: workflows/onboard-review-release
+name: Onboard Review Release
+domain: workflows
+version: 1.0.0
+intent: 将仓库探索、PR 评审、发布说明生成组合为可复用的声明式工作流。
+inputs:
+  - name: repository_path
+    type: string
+    description: 仓库绝对路径
+    required: true
+  - name: pull_request_ref
+    type: string
+    description: 待评审 PR 引用
+    required: true
+  - name: commits_range
+    type: string
+    description: 发布说明使用的提交范围
+    required: true
+outputs:
+  - name: workflow_report
+    type: markdown
+    description: 汇总 repository_report、review_report、release_notes 的总报告
+workflow:
+  steps:
+    - id: explore
+      title: 探索仓库
+      instructions: 调用 repo/explore-repository，生成仓库上下文。
+    - id: review
+      title: 评审 PR
+      instructions: 调用 code-review/review-pull-request，生成风险发现。
+    - id: release
+      title: 生成发布说明
+      instructions: 调用 docs/generate-release-notes，输出 release notes。
+success_criteria:
+  - 工作流严格按 explore -> review -> release 顺序执行。
+  - 最终 workflow_report 包含三段子结果摘要。
+  - 任一步失败时有可审计的 fallback 输出。
+failure_modes:
+  - mode: upstream_step_failed
+    trigger: 前序步骤失败导致后序输入不可用
+    fallback: 停止后续步骤并返回可用部分结果。
+  - mode: input_incomplete
+    trigger: 缺少必要输入字段
+    fallback: 明确指出缺失字段并请求补充。
+official_mapping:
+  openai:
+    native_tools: ["terminal", "workspace file read", "structured output"]
+    mapping_notes: 通过多步调用与结构化输出实现组合工作流。
+  github_copilot:
+    native_tools: ["chat", "workspace context", "pull request context"]
+    mapping_notes: 利用仓库与 PR 上下文串联阶段性任务结果。
+  anthropic:
+    native_tools: ["Claude Code shell", "file read"]
+    mapping_notes: 顺序执行子任务并合并为可复核工作流报告。
+stability_notes:
+  - 禁止编造事实、命令、指标或性能数据。
+  - 必须保留每个子步骤的输入输出映射关系。
+  - 失败步骤必须可追踪且可重试。

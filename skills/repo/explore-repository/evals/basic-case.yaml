@@ -1,0 +1,18 @@
+case_id: eval-repo-explore-basic
+skill_id: repo/explore-repository
+input:
+  repository_path: /tmp/demo-repo
+  focus_areas: ["src", "tests"]
+expected_output_constraints:
+  required_sections:
+    - 仓库概览
+    - 关键目录职责
+    - 核心依赖与构建入口
+    - 风险与未知项
+    - 下一步建议
+  output_format: markdown
+must_not:
+  - 编造事实
+  - 编造命令
+  - 编造指标或性能数据
+fallback_expectation: 无法完整扫描时，必须声明覆盖范围并给出下一步补充建议。

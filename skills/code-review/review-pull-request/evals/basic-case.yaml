@@ -1,0 +1,19 @@
+case_id: eval-pr-review-basic
+skill_id: code-review/review-pull-request
+input:
+  repository_path: /tmp/demo-repo
+  pull_request_ref: PR-42
+  review_focus: ["stability", "tests"]
+expected_output_constraints:
+  required_sections:
+    - 变更概览
+    - 按严重级别排序的发现
+    - 证据与影响说明
+    - 待确认问题
+    - 建议动作
+  findings_sorted_by_severity: true
+must_not:
+  - 编造事实
+  - 编造命令
+  - 编造指标或性能数据
+fallback_expectation: diff 不可访问时，必须明确阻塞原因并请求补充输入。

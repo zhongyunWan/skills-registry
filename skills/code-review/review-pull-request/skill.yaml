@@ -1,0 +1,58 @@
+id: code-review/review-pull-request
+name: Review Pull Request
+domain: code-review
+version: 1.0.0
+intent: 对 PR 变更进行风险评估并输出按严重度排序的结构化评审结论。
+inputs:
+  - name: repository_path
+    type: string
+    description: 仓库绝对路径
+    required: true
+  - name: pull_request_ref
+    type: string
+    description: PR 编号、分支范围或 commit 范围
+    required: true
+  - name: review_focus
+    type: string[]
+    description: 可选关注点，如稳定性、安全性、兼容性
+    required: false
+outputs:
+  - name: review_report
+    type: markdown
+    description: 包含发现、证据、影响与建议动作的评审报告
+workflow:
+  steps:
+    - id: collect-diff
+      title: 收集变更上下文
+      instructions: 读取 PR diff 及相关文件上下文。
+    - id: assess-risk
+      title: 评估风险与回归
+      instructions: 识别行为变化、边界条件与测试覆盖缺口。
+    - id: structure-findings
+      title: 结构化输出 findings
+      instructions: 依据严重度排序并附证据与影响说明。
+success_criteria:
+  - 报告按严重级别排序，且每条 finding 均可追溯。
+  - 报告明确说明回归风险与测试缺口。
+  - 输出包含建议动作并可直接执行。
+failure_modes:
+  - mode: diff_unavailable
+    trigger: 无法获取 PR diff 或引用范围
+    fallback: 返回阻塞原因并请求补充可读取的变更范围。
+  - mode: excessive_changes
+    trigger: 变更规模超出单次评审预算
+    fallback: 先覆盖高风险模块并明确未覆盖部分。
+official_mapping:
+  openai:
+    native_tools: ["terminal", "workspace file read"]
+    mapping_notes: 通过 diff 检查与文件上下文分析输出结构化评审。
+  github_copilot:
+    native_tools: ["pull request context", "chat", "workspace context"]
+    mapping_notes: 使用 PR 与工作区上下文进行风险评估与评论建议。
+  anthropic:
+    native_tools: ["Claude Code shell", "file read"]
+    mapping_notes: 使用代码差异和上下文文件生成审查发现列表。
+stability_notes:
+  - 禁止编造事实、命令、指标或性能数据。
+  - 无法确认的结论必须标记为待确认。
+  - findings 必须按严重级别输出。

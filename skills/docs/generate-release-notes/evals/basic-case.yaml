@@ -1,0 +1,20 @@
+case_id: eval-release-notes-basic
+skill_id: docs/generate-release-notes
+input:
+  repository_path: /tmp/demo-repo
+  commits_range: v1.1.0..v1.2.0
+  review_report: |
+    - [high] API response schema changed without migration note.
+expected_output_constraints:
+  required_sections:
+    - 版本范围与时间
+    - 用户可见变更
+    - 修复项
+    - 风险与注意事项
+    - 验证建议
+  output_format: markdown
+must_not:
+  - 编造事实
+  - 编造命令
+  - 编造指标或性能数据
+fallback_expectation: 输入范围无效时，必须返回可重试示例并说明缺失信息。

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-registry.local/spec/skill.schema.json",
+  "title": "Skill Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "domain",
+    "version",
+    "intent",
+    "inputs",
+    "outputs",
+    "workflow",
+    "success_criteria",
+    "failure_modes",
+    "official_mapping",
+    "stability_notes"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 3 },
+    "name": { "type": "string", "minLength": 3 },
+    "domain": {
+      "type": "string",
+      "enum": ["repo", "code-review", "docs", "workflows"]
+    },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "intent": { "type": "string", "minLength": 10 },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "type", "description", "required"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "description": { "type": "string" },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "type", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "instructions"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "instructions": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "success_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "failure_modes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["mode", "trigger", "fallback"],
+        "properties": {
+          "mode": { "type": "string" },
+          "trigger": { "type": "string" },
+          "fallback": { "type": "string" }
+        }
+      }
+    },
+    "official_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["openai", "github_copilot", "anthropic"],
+      "properties": {
+        "openai": { "$ref": "#/$defs/vendorMapping" },
+        "github_copilot": { "$ref": "#/$defs/vendorMapping" },
+        "anthropic": { "$ref": "#/$defs/vendorMapping" }
+      }
+    },
+    "stability_notes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "vendorMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["native_tools", "mapping_notes"],
+      "properties": {
+        "native_tools": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "mapping_notes": { "type": "string", "minLength": 10 }
+      }
+    }
+  }
+}

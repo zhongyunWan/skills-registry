@@ -1,0 +1,22 @@
+workflow_id: workflows/onboard-review-release
+steps:
+  - id: explore
+    uses_skill: repo/explore-repository
+    purpose: 建立仓库结构与架构上下文
+  - id: review
+    uses_skill: code-review/review-pull-request
+    purpose: 基于上下文完成 PR 风险评审
+  - id: release
+    uses_skill: docs/generate-release-notes
+    purpose: 基于评审与提交记录生成发布说明
+input_bindings:
+  repository_path: explore.repository_path
+  pull_request_ref: review.pull_request_ref
+  commits_range: release.commits_range
+output_bindings:
+  repository_report: explore.repository_report
+  review_report: review.review_report
+  release_notes: release.release_notes
+fallback_policy:
+  on_step_failure: stop_and_return_partial
+  escalation: 返回失败步骤、已完成结果与建议重试输入。

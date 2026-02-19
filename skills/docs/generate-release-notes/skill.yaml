@@ -1,0 +1,58 @@
+id: docs/generate-release-notes
+name: Generate Release Notes
+domain: docs
+version: 1.0.0
+intent: 从提交记录与评审上下文生成结构化、可追溯的发布说明文档。
+inputs:
+  - name: repository_path
+    type: string
+    description: 仓库绝对路径
+    required: true
+  - name: commits_range
+    type: string
+    description: 需要汇总的提交范围
+    required: true
+  - name: review_report
+    type: markdown
+    description: 可选，来自代码评审的风险摘要
+    required: false
+outputs:
+  - name: release_notes
+    type: markdown
+    description: 可发布的结构化版本说明文档
+workflow:
+  steps:
+    - id: collect-changes
+      title: 收集变更来源
+      instructions: 读取提交记录并可选合并评审报告。
+    - id: classify-items
+      title: 分类并提炼影响
+      instructions: 将变更归类为特性、修复、风险事项。
+    - id: render-notes
+      title: 生成发布说明
+      instructions: 输出固定章节并标记不确定项。
+success_criteria:
+  - 输出 release_notes 包含固定章节且可直接发布。
+  - 每个条目可映射到提交或评审依据。
+  - 明确列出风险与验证建议。
+failure_modes:
+  - mode: invalid_commit_range
+    trigger: commits_range 无法解析或无对应提交
+    fallback: 返回可用格式示例并请求重新输入。
+  - mode: insufficient_commit_context
+    trigger: 提交信息过于简略导致无法分类
+    fallback: 输出已知内容并标记待确认条目。
+official_mapping:
+  openai:
+    native_tools: ["terminal", "workspace file read"]
+    mapping_notes: 从 commit 与上下文读取生成结构化发布文档。
+  github_copilot:
+    native_tools: ["chat", "repository context", "pull request context"]
+    mapping_notes: 利用仓库上下文进行版本变更摘要与编排。
+  anthropic:
+    native_tools: ["Claude Code shell", "file read"]
+    mapping_notes: 聚合提交变更并输出标准化 release notes。
+stability_notes:
+  - 禁止编造事实、命令、指标或性能数据。
+  - 所有变更项必须有来源依据。
+  - 不确定信息必须显式标注。
